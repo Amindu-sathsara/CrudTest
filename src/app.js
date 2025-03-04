@@ -77,8 +77,30 @@ app.post("/createUser", async (req, res)=> {
           res.status(500).send("Can't find your friend here, Mah boy");
         }
       })
-      
 
+    //Update the user by _id
+    app.patch('/users',async (req, res) => {
+        const userId=req.body._id;
+        const data=req.body;
+        try{
+          const user=await User.findByIdAndUpdate({_id:userId},data,{
+            returnDocuments:"after",
+            runValidators:true,
+      
+          });
+          if(!user){
+            return res.status(404).send("User not found");
+          }
+          res.send("User is successfully updated");
+        }catch(err){
+          return res.status(404).send("Something went wrong trying to update again");
+        }
+      
+        }) // Here When we creating the real application we can comine authorized user request body fields and find the document from that and update that relavant document in the user collection
+
+    
+
+    
 
 
     connectToDB().then(() => {
