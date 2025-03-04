@@ -6,10 +6,17 @@ const bcrypt = require("bcrypt");
 const {validateCreateUserData}=require("./utils/Validation")
 
 app.use(express.json());  //I use this middleware to all the routes 
-app.post("/createUser", async (req, res)=> {
+app.post("/createUser", async (req, res) => {
     try {
         const { firstName, lastName, emailID, password, age, gender } = req.body;
-        validateCreateUserData(req);
+        
+        // Validate user input
+        try {
+            validateCreateUserData(req);
+        } catch (error) {
+            return res.status(400).json({ message: error.message });  // Send validation error response
+        }
+
         // Hash the password before storing it
         const hashedPassword = await bcrypt.hash(password, 10);
     
@@ -24,12 +31,12 @@ app.post("/createUser", async (req, res)=> {
         });
     
         await user.save();
-        res.status(201).json({ message: "User created successfully" });
-      } catch (error) {
+        res.status(201).json({ message: "User created successfully", user });
+    } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Error creating user" });
-      }
-    });
+    }
+});
 
 
     //End points for getting all the users 
@@ -98,7 +105,20 @@ app.post("/createUser", async (req, res)=> {
       
         }) // Here When we creating the real application we can comine authorized user request body fields and find the document from that and update that relavant document in the user collection
 
-    
+    //Delete the user by _id
+    app.delete("/deleteUser", async (req, res) => {
+        const userId=req.body._id;
+        try{
+          const user=await User.findByIdAndDelete(userId);
+          if(!user){
+            return res.status(404).send("That type of user is not available ")
+          }
+          res.send("User is successfully deleted");
+        }catch(err){
+          return res.status(404).send("Can't delete that user, Mah boy");
+        }
+        })
+      
 
     
 
