@@ -32,9 +32,12 @@ app.post("/createUser", async (req, res) => {
     
         await user.save();
         res.status(201).json({ message: "User created successfully", user });
-    } catch (error) {
+    }catch (error) {
+        if (error.errors && error.errors.gender) {
+            return res.status(400).json({ message: error.errors.gender.message });
+        }
         console.error(error);
-        res.status(500).json({ message: "Error creating user" });
+        res.status(400).send("Unable to create user"+error.message);
     }
 });
 

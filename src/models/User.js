@@ -25,6 +25,10 @@ const userSchema= new mongoose.Schema(
         },
         gender:{
             type: String,
+            enum: {
+                values: ["Male", "Female", "Other"],
+                message: "You should enter Male, Female, or Other only in your gender."
+            }
             }
     },{timestamps: true}
 )
